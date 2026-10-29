@@ -1,0 +1,2 @@
+# 編輯密碼：一鍵部署時 Cloudflare 會請你填這個值（本機開發時複製成 .dev.vars 再填）
+EDIT_KEY=

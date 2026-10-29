@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "trip-notes",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-10-08",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "trip-notes-db",
+      "database_id": "f657a1a1-8433-44ce-8156-2593b519d838"
+    }
+  ],
+  "observability": { "enabled": true }
+}

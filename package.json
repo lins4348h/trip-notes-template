@@ -1,0 +1,25 @@
+{
+  "name": "trip-notes",
+  "description": "旅誌：手機優先、多人共編的旅遊行程網站。",
+  "private": true,
+  "cloudflare": {
+    "label": "旅誌 Trip Notes",
+    "products": ["Workers", "D1"],
+    "categories": ["storage"],
+    "bindings": {
+      "EDIT_KEY": {
+        "description": "分享連結的**編輯密碼**。請自己想一組 16 字以上的英文＋數字（不要用平常的密碼）。旅伴打開 `網站網址/#k=這組密碼` 就能看、也能編輯。"
+      },
+      "DB": {
+        "description": "存放行程資料的資料庫，名稱不用改。第一次打開網站時會自動放入範例資料。"
+      }
+    }
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.136.1"
+  }
+}
