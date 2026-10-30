@@ -93,11 +93,16 @@ async function keywords(env, q) {
   const hit = Object.keys(DICT).filter(k => q.includes(k)).sort((a, b) => b.length - a.length).flatMap(k => DICT[k]);
   if (hit.length) return { keywords: [...new Set(hit)].slice(0, 4), source: 'dict' };
   if (!env.AI) return { keywords: [], source: 'none' };
-  const clean = t => [...new Set(String(t || '').toLowerCase().replace(/[^a-z,\s-]/g, ' ').split(/[,\n]+/).map(s => s.trim()).filter(s => s && s.length < 24))].slice(0, 4);
+  // 圖示庫用單字比較好找：多字片語之外，再補上每個字
+  const clean = t => {
+    const phrases = String(t || '').toLowerCase().replace(/[^a-z,\s-]/g, ' ').split(/[,\n]+/).map(s => s.trim()).filter(s => s && s.length < 24);
+    const words = phrases.flatMap(p => p.split(/\s+/)).filter(w => w.length > 2 && !['the', 'and', 'with'].includes(w));
+    return [...new Set([...phrases.filter(p => !p.includes(' ')), ...words.reverse(), ...phrases])].slice(0, 4);
+  };
   try {
     const r = await env.AI.run(AI_MODEL, {
       messages: [
-        { role: 'system', content: 'You turn a travel activity or place into short English search keywords for an icon library. Reply with 3 keywords, 1-2 words each, comma separated, lowercase, nothing else.' },
+        { role: 'system', content: 'You turn a travel activity or place into English search words for a simple icon library. Reply with 3 different common English nouns, ONE word each, that an icon could show (for example: ghost, house, boxing). Comma separated, lowercase, nothing else.' },
         { role: 'user', content: q },
       ],
       max_tokens: 24,
