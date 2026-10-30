@@ -113,7 +113,8 @@ const fmtLoc=n=>CUR().sym+Math.round(n).toLocaleString('en-US');
 const fmtTWD=n=>'NT$'+Math.round(n).toLocaleString('en-US');
 const byOrder=(a,b)=>(a.order??0)-(b.order??0)||(mins(a.start)??9999)-(mins(b.start)??9999);
 const dayItems=n=>S.items.filter(i=>+i.day===n).sort(byOrder);
-const mapUrl=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+// 地點欄位可以填名稱，也可以直接貼 Google 地圖連結
+const mapUrl=q=>/^https?:\/\//i.test(q)?q:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
 const safeUrl=u=>/^https?:\/\//i.test(u||'')?u:'';
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const nextOrder=list=>{const o=list.map(x=>x.order??0);return (o.length?Math.max(...o):0)+1000};
@@ -413,7 +414,7 @@ async function openSheet(kind,id){
     <div class="two"><div class="field"><label for="f-mode">交通（怎麼到這裡）</label><input id="f-mode" list="modes" value="${esc(d.moveMode||'')}" placeholder="地鐵、計程車…"></div>
     <div class="field"><label for="f-mtime">車程</label><input id="f-mtime" value="${esc(d.moveTime||'')}" placeholder="約 20 分"></div></div>
     <datalist id="modes"><option>地鐵</option><option>公車</option><option>計程車</option><option>Grab／Uber</option><option>包車</option><option>步行</option><option>火車</option><option>船</option><option>飛機</option></datalist>
-    <div class="field"><label for="f-place">地點（Google 地圖搜尋用，可留空）</label><input id="f-place" value="${esc(d.place||'')}" placeholder="例：景點或店家名稱"></div>
+    <div class="field"><label for="f-place">地點（Google 地圖搜尋用，可留空）</label><input id="f-place" value="${esc(d.place||'')}" placeholder="店家名稱，或貼上 Google 地圖連結"></div>
     <div class="field"><label for="f-note">備註</label><textarea id="f-note">${esc(d.note||'')}</textarea></div>
     <div class="field"><label for="f-day">放在哪一天（選別天就會搬過去）</label><select id="f-day">${dayOpts(d.day||S.day)}</select></div>`;
   if(kind==='booking')h+=`
