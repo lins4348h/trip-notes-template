@@ -129,6 +129,14 @@
       };
     },
     doc(p) { const [c, id] = p.split('/'); return docRef(c, id); },
+    // 其他 API（照片、關鍵字）：自動帶上密鑰
+    api(path, init = {}) {
+      const h = { 'x-edit-key': key, ...(init.headers || {}) };
+      if (!(init.body instanceof FormData) && init.body) h['content-type'] = 'application/json';
+      return fetch(path, { ...init, headers: h });
+    },
+    photoUrl(id, size) { return '/api/photo/' + encodeURIComponent(id) + '?s=' + (size === 'full' ? 'full' : 'thumb') + '&k=' + encodeURIComponent(key); },
+    refresh() { return sync(); },
     // 一次多筆寫入：ops = [{op:'put'|'patch'|'delete', col, id, data}]
     async batch(ops) {
       const changed = new Set();
