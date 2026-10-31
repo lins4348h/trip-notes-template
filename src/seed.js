@@ -8,7 +8,7 @@ export default [
    "title": "曼谷五日誌",
    "en": "Bangkok Notes",
    "code": "BKK",
-   "start": "2027-01-26",
+   "start": "2027-03-16",
    "lang": "th",
    "currency": "THB",
    "example": true,
@@ -85,7 +85,7 @@ export default [
    "end": "14:00",
    "moveMode": "包車或大型車",
    "moveTime": "約 45 分",
-   "note": "住宿建議 Asok／Phrom Phong 一帶",
+   "note": "先寄放行李，再到附近吃午餐",
    "order": 2000,
    "place": "",
    "start": "12:30",
@@ -197,7 +197,7 @@ export default [
    "end": "19:30",
    "moveMode": "BTS",
    "moveTime": "約 30 分",
-   "note": "週末市集主要週六日營業，週三請先確認",
+   "note": "週末市集主要週六日營業，平日請先確認",
    "order": 4000,
    "place": "Chatuchak Weekend Market",
    "start": "14:00",
@@ -523,9 +523,9 @@ export default [
    "day": 0,
    "done": false,
    "link": "",
-   "note": "每房每晚 NT$2,000–3,500",
+   "note": "選 BTS 站附近的飯店，確認可否提早寄放行李",
    "order": 1000,
-   "title": "住宿（Asok／Phrom Phong）"
+   "title": "住宿"
   }
  },
  {
@@ -547,7 +547,7 @@ export default [
    "day": 2,
    "done": false,
    "link": "",
-   "note": "5 人以上建議預約；接近出發時確認 2027 年 1 月營業時間與服裝規定",
+   "note": "5 人以上建議預約；接近出發時確認營業時間與服裝規定",
    "order": 5000,
    "title": "Octave Rooftop 訂位"
   }
@@ -602,7 +602,7 @@ export default [
   "col": "tips",
   "id": "t-0b",
   "data": {
-   "body": "建議 Asok／Phrom Phong，預算每房每晚 NT$2,000–3,500。",
+   "body": "選 BTS 站附近的飯店，移動最方便。",
    "order": 2000,
    "scope": 0,
    "title": "住宿"
@@ -632,7 +632,7 @@ export default [
   "col": "tips",
   "id": "t-2b",
   "data": {
-   "body": "2027 年 1 月的營業時間、訂位與服裝規定，接近出發時再確認。5 人以上建議預約。",
+   "body": "營業時間、訂位與服裝規定，接近出發時再確認。5 人以上建議預約。",
    "order": 5000,
    "scope": 2,
    "title": "Octave"
@@ -642,7 +642,7 @@ export default [
   "col": "tips",
   "id": "t-2c",
   "data": {
-   "body": "洽圖洽週末市集主要在週六、週日營業，1/27 是週三，平日多數攤位沒開。出發前確認，或考慮改去其他夜市。",
+   "body": "洽圖洽週末市集主要在週六、週日營業，平日多數攤位沒開。排行程前先確認營業日。",
    "order": 6000,
    "scope": 2,
    "title": "洽圖洽市集營業日"
