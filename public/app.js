@@ -204,6 +204,9 @@ function onWriteErr(e){
 
 /* ---------- 畫面 ---------- */
 let rq=0;function renderSoon(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;render()})}
+// 當地語言的字型只在用到時才下載（泰、日、韓字型檔很大）
+const LANG_FONTS={th:'Noto+Sans+Thai',ja:'Noto+Sans+JP',ko:'Noto+Sans+KR'};
+function loadLangFont(l){const f=LANG_FONTS[l];if(!f||document.getElementById('font-'+l))return;const k=document.createElement('link');k.id='font-'+l;k.rel='stylesheet';k.href=`https://fonts.googleapis.com/css2?family=${f}:wght@500;700&display=swap`;document.head.appendChild(k)}
 function renderHeader(){
   const t=trip(),first=DAYS[0],last=DAYS[DAYS.length-1];
   const yr=first&&first.iso?first.iso.slice(0,4):'';
@@ -211,7 +214,7 @@ function renderHeader(){
   $('#brand-t').textContent=t.title||'旅誌';
   $('#brand-s').textContent=[yr,range,t.code].filter(Boolean).join(' · ');
   document.title=t.title||'旅誌';
-  const lang=L(),tb=$('#tab-lang');tb.hidden=!lang;
+  const lang=L(),tb=$('#tab-lang');tb.hidden=!lang;loadLangFont(t.lang);
   if(lang)tb.querySelector('span').textContent=lang.name;
   document.documentElement.style.setProperty('--tabs',lang?5:4);
 }

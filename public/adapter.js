@@ -45,11 +45,22 @@
     const el = document.getElementById('sync'); if (!el) return;
     el.dataset.s = s; const sp = el.querySelector('span'); if (sp) sp.textContent = t;
   }
-  async function sync(full) {
-    if (stopped) return;
+  // iPhone 主畫面 App 切回來時，舊連線常已被系統關掉：請求一律加逾時，卡住就放棄重來
+  function timedFetch(url, init = {}, ms = 10000) {
+    const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms);
+    return fetch(url, { ...init, signal: ac.signal }).finally(() => clearTimeout(t));
+  }
+  let inflight = null;
+  function sync(full) {
+    if (stopped) return Promise.resolve();
     if (full) since = 0;
+    if (inflight) return inflight;              // 同一時間只跑一個同步
+    inflight = runSync().finally(() => { inflight = null; });
+    return inflight;
+  }
+  async function runSync() {
     try {
-      const r = await fetch('/api/sync?since=' + since, { headers, cache: 'no-store' });
+      const r = await timedFetch('/api/sync?since=' + since, { headers, cache: 'no-store' });
       if (r.status === 401) return badKey();
       if (!r.ok) throw new Error(String(r.status));
       const j = await r.json(), changed = new Set();
@@ -64,7 +75,7 @@
       else if (changed.size) emit(changed);
       if (failed) { failed = 0; status('live', '即時同步'); }
     } catch (e) {
-      failed++; status('off', '離線，稍後重試');
+      failed++; status('off', '連線中斷，點我重試');
     }
   }
   // 有人在操作時每 4 秒同步；放著不動 1 分鐘後改成每 15 秒；畫面不在前景就暫停
@@ -86,15 +97,17 @@
     sync();
     schedule();
     for (const ev of ['pointerdown', 'keydown', 'scroll', 'touchstart']) addEventListener(ev, wake, { passive: true, capture: true });
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { lastActive = Date.now(); sync(); schedule(); } });
+    const resume = () => { if (document.visibilityState !== 'visible') return; lastActive = Date.now(); sync(); schedule(); };
+    document.addEventListener('visibilitychange', resume);
+    for (const ev of ['pageshow', 'focus', 'online']) addEventListener(ev, resume);
   }
 
   async function send(method, c, id, body) {
     let r;
     try {
-      r = await fetch('/api/doc/' + encodeURIComponent(c) + '/' + encodeURIComponent(id), {
+      r = await timedFetch('/api/doc/' + encodeURIComponent(c) + '/' + encodeURIComponent(id), {
         method, headers, body: body ? JSON.stringify(body) : undefined,
-      });
+      }, 20000);
     } catch (e) { sync(true); throw { code: 'unavailable', message: '網路中斷' }; }
     if (r.status === 401) { badKey(); throw { code: 'unavailable', message: '密鑰錯誤' }; }
     if (r.status === 413) { sync(true); throw { code: 'quota_exceeded', message: '資料已達上限' }; }
@@ -150,7 +163,7 @@
       emit(changed);
       for (let i = 0; i < ops.length; i += 300) {
         let r;
-        try { r = await fetch('/api/batch', { method: 'POST', headers, body: JSON.stringify({ ops: ops.slice(i, i + 300) }) }); }
+        try { r = await timedFetch('/api/batch', { method: 'POST', headers, body: JSON.stringify({ ops: ops.slice(i, i + 300) }) }, 30000); }
         catch (e) { sync(true); throw { code: 'unavailable', message: '網路中斷' }; }
         if (r.status === 401) { badKey(); throw { code: 'unavailable', message: '密鑰錯誤' }; }
         if (!r.ok) { sync(true); throw { code: 'unavailable', message: '儲存失敗' }; }
@@ -187,6 +200,8 @@
   if (!key) document.addEventListener('DOMContentLoaded', badKey);
   document.addEventListener('click', e => {
     if (!e.target.closest('#sync') || !key || stopped) return;
+    // 斷線時點狀態＝立刻重新連線；連線正常時點＝更換「你是誰」
+    if (failed) { status('wait', '重新連線中…'); sync(true).then(schedule); return; }
     ls.set(NAME, ''); pickName().then(() => location.reload());
   });
 

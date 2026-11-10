@@ -23,6 +23,11 @@ const json = (body, status = 200) =>
 
 async function ensure(db) {
   if (ready) return;
+  // 平常只用一次查詢確認資料表都在；只有第一次部署時才建表、放範例
+  try {
+    const r = await db.prepare("SELECT EXISTS(SELECT 1 FROM docs) AS has, (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'photos') AS p").first();
+    if (r && r.has && r.p) { ready = true; return; }
+  } catch (e) { /* 資料表還沒建立 */ }
   await db.prepare(
     'CREATE TABLE IF NOT EXISTS docs (col TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, deleted INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL, PRIMARY KEY (col, id))'
   ).run();
